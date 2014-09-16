@@ -11,8 +11,9 @@ module ScormCloud
       else
         xml = connection.call("rustici.course.importCourse", :courseid => course_id, :path => file)
       end
-      if xml.elements['//rsp/importresult'].attributes["successful"] == "true"
-        title = xml.elements['//rsp/importresult/title'].text 
+
+      if xml.elements['//rsp/importresult'] && xml.elements['//rsp/importresult'].attributes["successful"] == "true"
+        title = xml.elements['//rsp/importresult/title'].text
         { :title => title, :warnings => [] }
       else
         nil
