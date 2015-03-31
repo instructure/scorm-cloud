@@ -1,7 +1,6 @@
 module ScormCloud
   class CourseService < BaseService
-    not_implemented :get_async_import_result,
-      :properties, :get_assets, :update_assets,
+    not_implemented :properties, :get_assets, :update_assets,
       :get_file_structure, :delete_files, :get_metadata
 
     # TODO: Handle Warnings
@@ -33,6 +32,20 @@ module ScormCloud
       else
         nil
       end
+    end
+
+    def get_async_import_result(token)
+      xml = connection.call("rustici.course.getAsyncImportResult", :token => token)
+
+      result = { :status => xml.elements['//rsp/status'].text }
+      
+      if result[:status] == 'error'
+        result[:message] = xml.elements['//rsp/error'].text 
+      elsif result[:status] == 'finished'
+        result[:title] = xml.elements['//rsp/importresults/title'].text
+      end
+
+      result
     end
 
     def exists(course_id)
