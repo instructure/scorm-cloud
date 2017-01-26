@@ -6,18 +6,29 @@ module ScormCloud
     attr_reader :code, :msg, :url
 
     def initialize(doc, url)
-      err = doc.elements["rsp"].elements["err"]
-      raise unless err
+      err = extract_err(doc)
+      if err
         code = err.attributes["code"]
         msg = err.attributes["msg"]
         super("Error In Scorm Cloud: Error=#{code} Message=#{msg} URL=#{url}")
         @code = code
         @msg = msg
         @url = url
-    rescue
+      else
         doc_xml = ''
         doc.write(doc_xml)
         @msg = "Request failed with an unknown error. Entire response: #{doc_xml}"
+      end
+    end
+
+    private
+
+    def extract_err(doc)
+      if doc.elements["rsp"].respond_to?(:elements) && doc.elements["rsp"].elements.respond_to?(:[])
+        doc.elements["rsp"].elements["err"]
+      else
+        nil
+      end
     end
   end
 
