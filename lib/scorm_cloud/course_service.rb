@@ -42,7 +42,11 @@ module ScormCloud
       if result[:status] == 'error'
         result[:message] = xml.elements['//rsp/error'].text 
       elsif result[:status] == 'finished'
-        result[:title] = xml.elements['//rsp/importresults/importresult/title'].text
+        if xml.elements['//rsp/importresults/importresult/title']
+          result[:title] = xml.elements['//importresults/importresult/title'].text
+        elsif result[:title] = xml.elements['//rsp/importresult/title']
+          result[:title] = xml.elements['//rsp/importresult/title'].text
+        end
       end
 
       result
